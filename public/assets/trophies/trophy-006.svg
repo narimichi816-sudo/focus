@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
+  <defs>
+    <linearGradient id="grad6" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9F43;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EE5A6F;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="300" rx="15" fill="url(#grad6)"/>
+  <circle cx="100" cy="100" r="50" fill="#FFF" opacity="0.2"/>
+  <circle cx="100" cy="100" r="30" fill="none" stroke="#FFF" stroke-width="4" opacity="0.6"/>
+  <circle cx="100" cy="100" r="15" fill="#FFF" opacity="0.4"/>
+  <text x="100" y="200" font-family="Arial" font-size="18" font-weight="bold" fill="#FFF" text-anchor="middle">Æ-</text>
+</svg>

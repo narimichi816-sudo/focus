@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="280" viewBox="0 0 200 280">
+  <defs>
+    <linearGradient id="grad4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#A8E6CF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3D5A80;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="280" rx="10" fill="url(#grad4)"/>
+  <circle cx="50" cy="100" r="25" fill="#FFF" opacity="0.4"/>
+  <circle cx="100" cy="100" r="25" fill="#FFF" opacity="0.4"/>
+  <circle cx="150" cy="100" r="25" fill="#FFF" opacity="0.4"/>
+  <line x1="75" y1="100" x2="125" y2="100" stroke="#FFF" stroke-width="3" opacity="0.6"/>
+  <text x="100" y="180" font-family="Arial" font-size="20" font-weight="bold" fill="#FFF" text-anchor="middle">™š</text>
+</svg>

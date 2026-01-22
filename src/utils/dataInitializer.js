@@ -1,6 +1,8 @@
 import { pomodoroSettingsStorage, notificationSettingsStorage } from '../services/StorageManager.js'
 import { createDefaultPomodoroSettings } from '../models/PomodoroSettings.js'
 import notificationService from '../services/NotificationService.js'
+import trophyService from '../services/TrophyService.js'
+import trophiesData from '../data/trophies.json'
 
 /**
  * データ初期化処理
@@ -14,7 +16,8 @@ import notificationService from '../services/NotificationService.js'
 export function initializeAllData() {
   initializePomodoroSettings()
   initializeNotificationSettings()
-  // 他のデータ（Todo、ジャーナル、トロフィー等）は
+  initializeTrophies()
+  // 他のデータ（Todo、ジャーナル等）は
   // ユーザーが作成するため、初期化は不要
 }
 
@@ -43,6 +46,23 @@ export function initializeNotificationSettings() {
 }
 
 /**
+ * トロフィーデータを初期化する
+ * トロフィーが存在しない場合、JSONファイルから読み込んで保存する
+ * @returns {void}
+ */
+export function initializeTrophies() {
+  const existingTrophies = trophyService.getAll()
+  
+  // 既にトロフィーが存在する場合は初期化しない
+  if (existingTrophies.length > 0) {
+    return
+  }
+
+  // JSONファイルからトロフィーデータを読み込んで保存
+  trophyService.createMany(trophiesData)
+}
+
+/**
  * ストレージの状態を確認する
  * @returns {Object} 各ストレージの状態
  */
@@ -50,11 +70,13 @@ export function checkStorageStatus() {
   return {
     pomodoroSettings: pomodoroSettingsStorage.get() !== null,
     notificationSettings: notificationSettingsStorage.get() !== null,
+    trophies: trophyService.getAll().length > 0,
   }
 }
 
 export default {
   initializeAllData,
   initializePomodoroSettings,
+  initializeTrophies,
   checkStorageStatus,
 }

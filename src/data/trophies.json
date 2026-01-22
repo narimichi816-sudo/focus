@@ -1,0 +1,107 @@
+[
+  {
+    "id": "trophy-001",
+    "name": "初日の出",
+    "type": "card",
+    "image": "/assets/trophies/trophy-001.svg",
+    "description": "初めてのタスクを完了した証"
+  },
+  {
+    "id": "trophy-002",
+    "name": "完璧主義者",
+    "type": "badge",
+    "image": "/assets/trophies/trophy-002.svg",
+    "description": "すべてのタスクを完璧に完了した証"
+  },
+  {
+    "id": "trophy-003",
+    "name": "早起きの達人",
+    "type": "character",
+    "image": "/assets/trophies/trophy-003.svg",
+    "description": "朝早くからタスクに取り組んだ証"
+  },
+  {
+    "id": "trophy-004",
+    "name": "継続の力",
+    "type": "card",
+    "image": "/assets/trophies/trophy-004.svg",
+    "description": "3日連続でタスクを完了した証"
+  },
+  {
+    "id": "trophy-005",
+    "name": "週間チャンピオン",
+    "type": "badge",
+    "image": "/assets/trophies/trophy-005.svg",
+    "description": "1週間連続でタスクを完了した証"
+  },
+  {
+    "id": "trophy-006",
+    "name": "集中の極み",
+    "type": "character",
+    "image": "/assets/trophies/trophy-006.svg",
+    "description": "長時間集中してタスクを完了した証"
+  },
+  {
+    "id": "trophy-007",
+    "name": "計画の達人",
+    "type": "card",
+    "image": "/assets/trophies/trophy-007.svg",
+    "description": "事前に計画を立ててタスクを完了した証"
+  },
+  {
+    "id": "trophy-008",
+    "name": "スピードスター",
+    "type": "badge",
+    "image": "/assets/trophies/trophy-008.svg",
+    "description": "素早くタスクを完了した証"
+  },
+  {
+    "id": "trophy-009",
+    "name": "忍耐の英雄",
+    "type": "character",
+    "image": "/assets/trophies/trophy-009.svg",
+    "description": "困難なタスクを最後までやり遂げた証"
+  },
+  {
+    "id": "trophy-010",
+    "name": "月間マスター",
+    "type": "card",
+    "image": "/assets/trophies/trophy-010.svg",
+    "description": "1ヶ月間連続でタスクを完了した証"
+  },
+  {
+    "id": "trophy-011",
+    "name": "効率の魔術師",
+    "type": "badge",
+    "image": "/assets/trophies/trophy-011.svg",
+    "description": "効率的にタスクを完了した証"
+  },
+  {
+    "id": "trophy-012",
+    "name": "目標達成者",
+    "type": "character",
+    "image": "/assets/trophies/trophy-012.svg",
+    "description": "設定した目標を達成した証"
+  },
+  {
+    "id": "trophy-013",
+    "name": "時間管理のプロ",
+    "type": "card",
+    "image": "/assets/trophies/trophy-013.svg",
+    "description": "時間を有効活用してタスクを完了した証"
+  },
+  {
+    "id": "trophy-014",
+    "name": "習慣の形成者",
+    "type": "badge",
+    "image": "/assets/trophies/trophy-014.svg",
+    "description": "良い習慣を身につけた証"
+  },
+  {
+    "id": "trophy-015",
+    "name": "不屈の精神",
+    "type": "character",
+    "image": "/assets/trophies/trophy-015.svg",
+    "description": "諦めずに最後までやり遂げた証"
+  }
+]
