@@ -5,7 +5,7 @@ import { Card, Button } from '../components/index.js'
 import './TrophyCollection.css'
 
 /**
- * ?????????????????????
+ * トロフィーコレクションページコンポーネント
  */
 function TrophyCollection() {
   const [collectionItems, setCollectionItems] = useState([])
@@ -13,6 +13,7 @@ function TrophyCollection() {
   const [sortBy, setSortBy] = useState('acquiredAt') // acquiredAt, name, type
   const [filterType, setFilterType] = useState('all') // all, card, badge, character
   const [selectedTrophy, setSelectedTrophy] = useState(null)
+  const [imageErrors, setImageErrors] = useState(new Set()) // 画像読み込みエラーを追跡
 
   useEffect(() => {
     loadCollection()
@@ -23,7 +24,7 @@ function TrophyCollection() {
   }, [collectionItems, sortBy, filterType])
 
   /**
-   * ???????????
+   * コレクションを読み込む
    */
   const loadCollection = () => {
     const acquiredTrophies = acquiredTrophyService.getAll()
@@ -161,11 +162,36 @@ function TrophyCollection() {
                 className="trophy-item"
                 onClick={() => setSelectedTrophy(item)}
               >
-                <img
-                  src={item.trophy.image}
-                  alt={item.trophy.name}
-                  className="trophy-image"
-                />
+                {imageErrors.has(item.id) ? (
+                  <div className="trophy-image-placeholder">
+                    <span className="placeholder-icon">🏆</span>
+                    <span className="placeholder-text">画像読み込みエラー</span>
+                  </div>
+                ) : (
+                  <img
+                    src={item.trophy.image}
+                    alt={item.trophy.name}
+                    className="trophy-image"
+                    onError={(e) => {
+                      console.error(`画像読み込みエラー: ${item.trophy.image}`, {
+                        trophyId: item.trophy.id,
+                        trophyName: item.trophy.name,
+                        imagePath: item.trophy.image,
+                        error: e,
+                        currentUrl: window.location.href,
+                      })
+                      setImageErrors((prev) => new Set([...prev, item.id]))
+                    }}
+                    onLoad={() => {
+                      // 画像が正常に読み込まれた場合、エラーセットから削除
+                      setImageErrors((prev) => {
+                        const newSet = new Set(prev)
+                        newSet.delete(item.id)
+                        return newSet
+                      })
+                    }}
+                  />
+                )}
                 <h4 className="trophy-name">{item.trophy.name}</h4>
                 <p className="trophy-type">{getTypeLabel(item.trophy.type)}</p>
                 <p className="acquired-date">
@@ -194,11 +220,35 @@ function TrophyCollection() {
               ×
             </button>
             <div className="trophy-modal-body">
-              <img
-                src={selectedTrophy.trophy.image}
-                alt={selectedTrophy.trophy.name}
-                className="trophy-image-large"
-              />
+              {imageErrors.has(selectedTrophy.id) ? (
+                <div className="trophy-image-placeholder-large">
+                  <span className="placeholder-icon-large">🏆</span>
+                  <span className="placeholder-text-large">画像読み込みエラー</span>
+                </div>
+              ) : (
+                <img
+                  src={selectedTrophy.trophy.image}
+                  alt={selectedTrophy.trophy.name}
+                  className="trophy-image-large"
+                  onError={(e) => {
+                    console.error(`画像読み込みエラー: ${selectedTrophy.trophy.image}`, {
+                      trophyId: selectedTrophy.trophy.id,
+                      trophyName: selectedTrophy.trophy.name,
+                      imagePath: selectedTrophy.trophy.image,
+                      error: e,
+                      currentUrl: window.location.href,
+                    })
+                    setImageErrors((prev) => new Set([...prev, selectedTrophy.id]))
+                  }}
+                  onLoad={() => {
+                    setImageErrors((prev) => {
+                      const newSet = new Set(prev)
+                      newSet.delete(selectedTrophy.id)
+                      return newSet
+                    })
+                  }}
+                />
+              )}
               <h2 className="trophy-name-large">{selectedTrophy.trophy.name}</h2>
               <p className="trophy-type-large">{getTypeLabel(selectedTrophy.trophy.type)}</p>
               <p className="trophy-description">{selectedTrophy.trophy.description}</p>

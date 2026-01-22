@@ -35,9 +35,15 @@ export function validateTodoTask(data) {
     }
 
     // 過去の日付は許可しない（要件定義書には明記されていないが、一般的な制約）
+    // 日付部分のみを比較する（時刻は無視、タイムゾーンの問題を回避）
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-    if (dueDate < today) {
+    const todayStr = today.toISOString().split('T')[0] // YYYY-MM-DD形式
+    
+    const dueDateObj = new Date(dueDate)
+    const dueDateStr = dueDateObj.toISOString().split('T')[0] // YYYY-MM-DD形式
+    
+    if (dueDateStr < todayStr) {
       return '期限日は今日以降の日付を入力してください'
     }
   }

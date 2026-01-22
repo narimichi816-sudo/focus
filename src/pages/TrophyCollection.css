@@ -5,7 +5,7 @@
   padding: 1rem;
 }
 
-/* ???????? */
+/* コレクション進捗 */
 .collection-progress {
   background: #f8f9fa;
   border-radius: 0.5rem;
@@ -60,7 +60,7 @@
   border-radius: 12px;
 }
 
-/* ????????? */
+/* フィルターとソート */
 .collection-controls {
   display: flex;
   gap: 1.5rem;
@@ -103,7 +103,7 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-/* ??????? */
+/* トロフィー一覧 */
 .trophy-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -136,6 +136,31 @@
   height: auto;
   margin-bottom: 0.75rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  object-fit: contain;
+}
+
+.trophy-image-placeholder {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+  border: 2px dashed #ccc;
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.placeholder-text {
+  font-size: 0.75rem;
+  color: #999;
+  text-align: center;
 }
 
 .trophy-item .trophy-name {
@@ -157,7 +182,7 @@
   margin-top: 0.5rem;
 }
 
-/* ???????? */
+/* 空のコレクション */
 .empty-collection {
   text-align: center;
   padding: 3rem;
@@ -170,7 +195,7 @@
   margin: 0.5rem 0;
 }
 
-/* ??????????? */
+/* トロフィー詳細モーダル */
 .trophy-modal-overlay {
   position: fixed;
   top: 0;
@@ -251,6 +276,31 @@
   margin: 0 auto 1.5rem;
   display: block;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  object-fit: contain;
+}
+
+.trophy-image-placeholder-large {
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border-radius: 0.5rem;
+  margin: 0 auto 1.5rem;
+  border: 2px dashed #ccc;
+}
+
+.placeholder-icon-large {
+  font-size: 5rem;
+  margin-bottom: 0.5rem;
+}
+
+.placeholder-text-large {
+  font-size: 0.875rem;
+  color: #999;
+  text-align: center;
 }
 
 .trophy-name-large {
@@ -289,7 +339,7 @@
   color: #333;
 }
 
-/* ?????????? */
+/* レスポンシブデザイン */
 @media (max-width: 768px) {
   .trophy-collection {
     padding: 0.5rem;

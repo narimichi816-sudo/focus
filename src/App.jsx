@@ -29,6 +29,7 @@ function App() {
   const [todayTodos, setTodayTodos] = useState([])
   const [challenge, setChallenge] = useState(null)
   const [challengeCondition, setChallengeCondition] = useState(null)
+  const [trophyImageError, setTrophyImageError] = useState(false)
 
   // URLから初期パスを取得
   useEffect(() => {
@@ -72,6 +73,7 @@ function App() {
     // 本日のトロフィーチャレンジを読み込む
     const todayChallenge = trophyChallengeService.getTodayChallenge()
     setChallenge(todayChallenge)
+    setTrophyImageError(false) // チャレンジを読み込む際にエラー状態をリセット
     
     if (todayChallenge) {
       const condition = trophyChallengeService.checkAcquisitionCondition()
@@ -237,11 +239,21 @@ function App() {
               {challenge ? (
                 <div className="main-trophy-content">
                   <div className="main-trophy-display">
-                    <img 
-                      src={challenge.trophy.image} 
-                      alt={challenge.trophy.name}
-                      className="main-trophy-image"
-                    />
+                    {trophyImageError ? (
+                      <div className="main-trophy-image-placeholder">
+                        <span>🏆</span>
+                      </div>
+                    ) : (
+                      <img 
+                        src={challenge.trophy.image} 
+                        alt={challenge.trophy.name}
+                        className="main-trophy-image"
+                        onError={(e) => {
+                          console.error(`画像読み込みエラー: ${challenge.trophy.image}`, e)
+                          setTrophyImageError(true)
+                        }}
+                      />
+                    )}
                     <h3 className="main-trophy-name">{challenge.trophy.name}</h3>
                     <p className="main-trophy-description">{challenge.trophy.description}</p>
                   </div>
