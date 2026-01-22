@@ -4,7 +4,7 @@ import { Card, Button } from '../components/index.js'
 import './TrophyChallenge.css'
 
 /**
- * ????????????????????
+ * トロフィーチャレンジページコンポーネント
  */
 function TrophyChallenge() {
   const [challenge, setChallenge] = useState(null)
@@ -31,7 +31,7 @@ function TrophyChallenge() {
   }, [isAcquired])
 
   /**
-   * ??????????
+   * チャレンジを読み込む
    */
   const loadChallenge = () => {
     const todayChallenge = trophyChallengeService.getTodayChallenge()
@@ -57,7 +57,7 @@ function TrophyChallenge() {
   }
 
   /**
-   * ??????????
+   * トロフィーを獲得する
    */
   const handleAcquire = () => {
     const result = trophyChallengeService.acquireTrophy()
@@ -66,15 +66,15 @@ function TrophyChallenge() {
       setIsAcquired(true)
       setShowAnimation(true)
 
-      // ????????3?????????
+      // アニメーションを3秒後に非表示にする
       setTimeout(() => {
         setShowAnimation(false)
       }, 3000)
 
-      // ?????????????
+      // 通知を表示（必要に応じて）
       if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('????????', {
-          body: `${result.challenge.trophy.name}????????`,
+        new Notification('トロフィー獲得！', {
+          body: `${result.challenge.trophy.name}を獲得しました！`,
           icon: result.challenge.trophy.image,
         })
       }
@@ -83,8 +83,8 @@ function TrophyChallenge() {
 
   if (!challenge) {
     return (
-      <Card title="??????????">
-        <p>????????????????</p>
+      <Card title="トロフィーチャレンジ">
+        <p>トロフィーが準備されていません。</p>
       </Card>
     )
   }
@@ -93,13 +93,13 @@ function TrophyChallenge() {
 
   return (
     <div className="trophy-challenge">
-      <Card title="?????????????">
+      <Card title="本日のトロフィーチャレンジ">
         <div className="trophy-challenge-content">
-          {/* ????????? */}
+          {/* 獲得アニメーション */}
           {showAnimation && (
             <div className="trophy-acquisition-animation">
               <div className="animation-content">
-                <h2>?? ????????</h2>
+                <h2>🎉 トロフィー獲得！</h2>
                 <img
                   src={trophy.image}
                   alt={trophy.name}
@@ -110,7 +110,7 @@ function TrophyChallenge() {
             </div>
           )}
 
-          {/* ??????? */}
+          {/* トロフィー表示 */}
           <div className="trophy-display">
             <div className={`trophy-card ${isAcquired ? 'acquired' : ''}`}>
               <img
@@ -121,16 +121,16 @@ function TrophyChallenge() {
               <h3 className="trophy-name">{trophy.name}</h3>
               <p className="trophy-description">{trophy.description}</p>
               {isAcquired && (
-                <div className="acquired-badge">? ????</div>
+                <div className="acquired-badge">✓ 獲得済み</div>
               )}
             </div>
           </div>
 
-          {/* ???? */}
+          {/* 獲得条件 */}
           <div className="acquisition-condition">
-            <h3>????</h3>
+            <h3>獲得条件</h3>
             <p className="condition-description">
-              ??????????????2??????????????????????????
+              今日が期限日のタスクのうち、2日前までに作成されたタスクをすべて完了してください。
             </p>
 
             {condition && (
@@ -144,14 +144,14 @@ function TrophyChallenge() {
                   />
                 </div>
                 <p className="progress-text">
-                  {condition.completedCount} / {condition.totalCount} ?????
+                  {condition.completedCount} / {condition.totalCount} タスク完了
                 </p>
               </div>
             )}
 
             {condition && condition.eligibleTasks.length > 0 && (
               <div className="eligible-tasks">
-                <h4>???????</h4>
+                <h4>対象タスク一覧</h4>
                 <ul>
                   {condition.eligibleTasks.map((task) => (
                     <li
@@ -159,11 +159,11 @@ function TrophyChallenge() {
                       className={task.completed ? 'completed' : ''}
                     >
                       <span className="task-checkbox">
-                        {task.completed ? '?' : '?'}
+                        {task.completed ? '✓' : '○'}
                       </span>
                       <span className="task-title">{task.title}</span>
                       <span className="task-date">
-                        (??: {new Date(task.createdAt).toLocaleDateString('ja-JP')})
+                        (作成: {new Date(task.createdAt).toLocaleDateString('ja-JP')})
                       </span>
                     </li>
                   ))}
@@ -174,19 +174,19 @@ function TrophyChallenge() {
             {condition && condition.eligibleTasks.length === 0 && (
               <div className="no-eligible-tasks">
                 <p>
-                  ??????????????????
+                  獲得条件を満たすタスクがありません。
                   <br />
-                  2???????????????????????????????????
+                  2日前までに作成されたタスクで、今日が期限日のタスクを追加してください。
                 </p>
               </div>
             )}
           </div>
 
-          {/* ?????????????????????? */}
+          {/* 手動獲得ボタン（デバッグ用、通常は自動獲得） */}
           {condition && condition.isEligible && !isAcquired && (
             <div className="acquire-button-container">
               <Button variant="primary" onClick={handleAcquire}>
-                ??????????
+                トロフィーを獲得する
               </Button>
             </div>
           )}

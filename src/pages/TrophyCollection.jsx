@@ -46,17 +46,17 @@ function TrophyCollection() {
   }
 
   /**
-   * ??????????????
+   * フィルターとソートを適用する
    */
   const applyFiltersAndSort = () => {
     let filtered = [...collectionItems]
 
-    // ????????
+    // 種類でフィルター
     if (filterType !== 'all') {
       filtered = filtered.filter((item) => item.trophy.type === filterType)
     }
 
-    // ???
+    // ソート
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'acquiredAt':
@@ -74,7 +74,7 @@ function TrophyCollection() {
   }
 
   /**
-   * ?????????????
+   * コレクション進捗を計算する
    */
   const getCollectionProgress = () => {
     const totalTrophies = trophyService.getAll().length
@@ -92,21 +92,21 @@ function TrophyCollection() {
 
   return (
     <div className="trophy-collection">
-      <Card title="???????????">
-        {/* ???????? */}
+      <Card title="トロフィーコレクション">
+        {/* コレクション進捗 */}
         <div className="collection-progress">
-          <h3>????????</h3>
+          <h3>コレクション進捗</h3>
           <div className="progress-stats">
             <div className="stat-item">
-              <span className="stat-label">???</span>
+              <span className="stat-label">獲得数</span>
               <span className="stat-value">{progress.acquiredCount}</span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">??</span>
+              <span className="stat-label">総数</span>
               <span className="stat-value">{progress.totalCount}</span>
             </div>
             <div className="stat-item">
-              <span className="stat-label">???</span>
+              <span className="stat-label">進捗率</span>
               <span className="stat-value">{progress.progressRate.toFixed(1)}%</span>
             </div>
           </div>
@@ -118,40 +118,40 @@ function TrophyCollection() {
           </div>
         </div>
 
-        {/* ????????? */}
+        {/* フィルターとソート */}
         <div className="collection-controls">
           <div className="filter-group">
-            <label htmlFor="filter-type">????????:</label>
+            <label htmlFor="filter-type">種類でフィルター:</label>
             <select
               id="filter-type"
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
             >
-              <option value="all">???</option>
-              <option value="card">???</option>
-              <option value="badge">???</option>
-              <option value="character">???</option>
+              <option value="all">すべて</option>
+              <option value="card">カード</option>
+              <option value="badge">バッジ</option>
+              <option value="character">立ち絵</option>
             </select>
           </div>
           <div className="sort-group">
-            <label htmlFor="sort-by">???:</label>
+            <label htmlFor="sort-by">ソート:</label>
             <select
               id="sort-by"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
-              <option value="acquiredAt">?????</option>
-              <option value="name">???</option>
-              <option value="type">???</option>
+              <option value="acquiredAt">獲得日時順</option>
+              <option value="name">名前順</option>
+              <option value="type">種類順</option>
             </select>
           </div>
         </div>
 
-        {/* ??????? */}
+        {/* トロフィー一覧 */}
         {filteredItems.length === 0 ? (
           <div className="empty-collection">
-            <p>?????????????????</p>
-            <p>????????????????????????????????</p>
+            <p>獲得済みのトロフィーがありません。</p>
+            <p>トロフィーチャレンジで条件を満たしてトロフィーを獲得しましょう！</p>
           </div>
         ) : (
           <div className="trophy-grid">
@@ -169,7 +169,7 @@ function TrophyCollection() {
                 <h4 className="trophy-name">{item.trophy.name}</h4>
                 <p className="trophy-type">{getTypeLabel(item.trophy.type)}</p>
                 <p className="acquired-date">
-                  ???: {new Date(item.acquiredAt).toLocaleDateString('ja-JP')}
+                  獲得日: {new Date(item.acquiredAt).toLocaleDateString('ja-JP')}
                 </p>
               </div>
             ))}
@@ -177,7 +177,7 @@ function TrophyCollection() {
         )}
       </Card>
 
-      {/* ??????????? */}
+      {/* トロフィー詳細モーダル */}
       {selectedTrophy && (
         <div
           className="trophy-modal-overlay"
@@ -191,7 +191,7 @@ function TrophyCollection() {
               className="modal-close-button"
               onClick={() => setSelectedTrophy(null)}
             >
-              �
+              ×
             </button>
             <div className="trophy-modal-body">
               <img
@@ -204,7 +204,7 @@ function TrophyCollection() {
               <p className="trophy-description">{selectedTrophy.trophy.description}</p>
               <div className="trophy-acquired-info">
                 <p>
-                  <strong>????:</strong>{' '}
+                  <strong>獲得日時:</strong>{' '}
                   {new Date(selectedTrophy.acquiredAt).toLocaleString('ja-JP')}
                 </p>
               </div>
@@ -217,15 +217,15 @@ function TrophyCollection() {
 }
 
 /**
- * ????????????????
- * @param {string} type - ????????
+ * トロフィーの種類ラベルを取得する
+ * @param {string} type - トロフィーの種類
  * @returns {string}
  */
 function getTypeLabel(type) {
   const labels = {
-    card: '???',
-    badge: '???',
-    character: '???',
+    card: 'カード',
+    badge: 'バッジ',
+    character: '立ち絵',
   }
   return labels[type] || type
 }
