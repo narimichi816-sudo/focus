@@ -13,6 +13,7 @@ import {
   Modal,
   Notification,
 } from './components/index.js'
+import { PomodoroTimer } from './pages/index.js'
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false)
@@ -34,9 +35,10 @@ function App() {
 
   const navItems = [
     { id: '1', label: 'ホーム', path: '/' },
-    { id: '2', label: 'Todo', path: '/todo' },
-    { id: '3', label: 'ジャーナル', path: '/journal' },
-    { id: '4', label: 'トロフィー', path: '/trophy' },
+    { id: '2', label: 'ポモドーロ', path: '/pomodoro' },
+    { id: '3', label: 'Todo', path: '/todo' },
+    { id: '4', label: 'ジャーナル', path: '/journal' },
+    { id: '5', label: 'トロフィー', path: '/trophy' },
   ]
 
   const showNotification = (message, type = 'info') => {
@@ -65,94 +67,99 @@ function App() {
       }
     >
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-        <Card title="ステップ3: 共通UIコンポーネント - 動作確認">
-          <p>以下のコンポーネントが正常に動作しています。</p>
-        </Card>
-
-        <div className="grid grid-2">
-          <Card title="ボタンコンポーネント">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <Button variant="primary" onClick={() => showNotification('プライマリーボタンがクリックされました', 'info')}>
-                プライマリーボタン
-              </Button>
-              <Button variant="secondary" onClick={() => showNotification('セカンダリーボタンがクリックされました', 'info')}>
-                セカンダリーボタン
-              </Button>
-              <Button variant="danger" onClick={() => showNotification('危険ボタンがクリックされました', 'error')}>
-                危険ボタン
-              </Button>
-              <Button variant="outline" onClick={() => setIsModalOpen(true)}>
-                モーダルを開く
-              </Button>
-              <Button disabled>無効化ボタン</Button>
-            </div>
+      {currentPath === '/pomodoro' ? (
+        <PomodoroTimer />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <Card title="ステップ4: ポモドーロタイマー機能 - 実装完了">
+            <p>ポモドーロタイマー機能が実装されました。</p>
+            <p>ナビゲーションから「ポモドーロ」を選択してタイマーを利用できます。</p>
           </Card>
 
-          <Card title="入力コンポーネント">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <Input
-                label="テキスト入力"
-                placeholder="テキストを入力してください"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-              />
-              <Input
-                type="date"
-                label="日付入力"
-                value={dateValue}
-                onChange={(e) => setDateValue(e.target.value)}
-                required
-              />
-              {dateValue && (
-                <p style={{ fontSize: '0.875rem', color: '#666', margin: 0 }}>
-                  選択された日付: {dateValue}
-                </p>
-              )}
-              <Textarea
-                label="テキストエリア"
-                placeholder="複数行のテキストを入力してください"
-                value={textareaValue}
-                onChange={(e) => setTextareaValue(e.target.value)}
-                rows={4}
-              />
+          <div className="grid grid-2">
+            <Card title="ボタンコンポーネント">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <Button variant="primary" onClick={() => showNotification('プライマリーボタンがクリックされました', 'info')}>
+                  プライマリーボタン
+                </Button>
+                <Button variant="secondary" onClick={() => showNotification('セカンダリーボタンがクリックされました', 'info')}>
+                  セカンダリーボタン
+                </Button>
+                <Button variant="danger" onClick={() => showNotification('危険ボタンがクリックされました', 'error')}>
+                  危険ボタン
+                </Button>
+                <Button variant="outline" onClick={() => setIsModalOpen(true)}>
+                  モーダルを開く
+                </Button>
+                <Button disabled>無効化ボタン</Button>
+              </div>
+            </Card>
+
+            <Card title="入力コンポーネント">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <Input
+                  label="テキスト入力"
+                  placeholder="テキストを入力してください"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                />
+                <Input
+                  type="date"
+                  label="日付入力"
+                  value={dateValue}
+                  onChange={(e) => setDateValue(e.target.value)}
+                  required
+                />
+                {dateValue && (
+                  <p style={{ fontSize: '0.875rem', color: '#666', margin: 0 }}>
+                    選択された日付: {dateValue}
+                  </p>
+                )}
+                <Textarea
+                  label="テキストエリア"
+                  placeholder="複数行のテキストを入力してください"
+                  value={textareaValue}
+                  onChange={(e) => setTextareaValue(e.target.value)}
+                  rows={4}
+                />
+              </div>
+            </Card>
+          </div>
+
+          <Card title="通知コンポーネント">
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <Button
+                variant="primary"
+                size="small"
+                onClick={() => showNotification('成功メッセージ', 'success')}
+              >
+                成功通知
+              </Button>
+              <Button
+                variant="danger"
+                size="small"
+                onClick={() => showNotification('エラーメッセージ', 'error')}
+              >
+                エラー通知
+              </Button>
+              <Button
+                variant="secondary"
+                size="small"
+                onClick={() => showNotification('情報メッセージ', 'info')}
+              >
+                情報通知
+              </Button>
+              <Button
+                variant="outline"
+                size="small"
+                onClick={() => showNotification('警告メッセージ', 'warning')}
+              >
+                警告通知
+              </Button>
             </div>
           </Card>
         </div>
-
-        <Card title="通知コンポーネント">
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <Button
-              variant="primary"
-              size="small"
-              onClick={() => showNotification('成功メッセージ', 'success')}
-            >
-              成功通知
-            </Button>
-            <Button
-              variant="danger"
-              size="small"
-              onClick={() => showNotification('エラーメッセージ', 'error')}
-            >
-              エラー通知
-            </Button>
-            <Button
-              variant="secondary"
-              size="small"
-              onClick={() => showNotification('情報メッセージ', 'info')}
-            >
-              情報通知
-            </Button>
-            <Button
-              variant="outline"
-              size="small"
-              onClick={() => showNotification('警告メッセージ', 'warning')}
-            >
-              警告通知
-            </Button>
-          </div>
-        </Card>
-      </div>
+      )}
 
       <Modal
         isOpen={isModalOpen}

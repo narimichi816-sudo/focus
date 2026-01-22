@@ -1,0 +1,147 @@
+.pomodoro-timer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.pomodoro-timer-card {
+  padding: 2rem;
+}
+
+.pomodoro-timer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.pomodoro-session-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  font-size: 1rem;
+  color: #666;
+}
+
+.session-counter {
+  font-weight: 600;
+}
+
+.completed-sessions {
+  color: #888;
+}
+
+.pomodoro-phase {
+  text-align: center;
+}
+
+.phase-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  padding: 0.5rem 1.5rem;
+  background-color: #f0f0f0;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.pomodoro-timer-display {
+  text-align: center;
+}
+
+.timer-time {
+  font-size: 4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #333;
+  line-height: 1;
+  font-family: 'Courier New', monospace;
+}
+
+.pomodoro-progress {
+  width: 100%;
+  max-width: 400px;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #8bc34a);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.pomodoro-controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pomodoro-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-field {
+  width: 100%;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .pomodoro-timer-card {
+    padding: 1.5rem;
+  }
+
+  .timer-time {
+    font-size: 3rem;
+  }
+
+  .pomodoro-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .pomodoro-controls .btn {
+    width: 100%;
+  }
+
+  .settings-actions {
+    flex-direction: column;
+  }
+
+  .settings-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .pomodoro-timer-card {
+    padding: 1rem;
+  }
+
+  .timer-time {
+    font-size: 2.5rem;
+  }
+
+  .phase-text {
+    font-size: 1rem;
+    padding: 0.4rem 1rem;
+  }
+
+  .pomodoro-session-info {
+    font-size: 0.875rem;
+  }
+}
