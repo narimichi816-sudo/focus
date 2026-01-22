@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense, useMemo, useCallback } from 'react'
 import './App.css'
 import './styles/common.css'
 import { initializeAllData } from './utils/dataInitializer.js'
@@ -10,10 +10,16 @@ import {
   Card,
   Notification,
 } from './components/index.js'
-import { PomodoroTimer, TodoList, Journal, TrophyChallenge, TrophyCollection } from './pages/index.js'
 import pomodoroSettingsService from './services/PomodoroSettingsService.js'
 import todoService from './services/TodoService.js'
 import trophyChallengeService from './services/TrophyChallengeService.js'
+
+// コード分割: ページコンポーネントを遅延読み込み
+const PomodoroTimer = lazy(() => import('./pages/PomodoroTimer.jsx'))
+const TodoList = lazy(() => import('./pages/TodoList.jsx'))
+const Journal = lazy(() => import('./pages/Journal.jsx'))
+const TrophyChallenge = lazy(() => import('./pages/TrophyChallenge.jsx'))
+const TrophyCollection = lazy(() => import('./pages/TrophyCollection.jsx'))
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false)
@@ -77,10 +83,10 @@ function App() {
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [isInitialized, currentPath])
+  }, [isInitialized, currentPath, loadMainScreenData])
 
-  // メイン画面のデータを読み込む
-  const loadMainScreenData = () => {
+  // メイン画面のデータを読み込む（useCallbackでメモ化）
+  const loadMainScreenData = useCallback(() => {
     // ポモドーロ設定を読み込む
     const settings = pomodoroSettingsService.get()
     setPomodoroSettings(settings)
@@ -101,20 +107,21 @@ function App() {
       const condition = trophyChallengeService.checkAcquisitionCondition()
       setChallengeCondition(condition)
     }
-  }
+  }, [])
 
-  const navItems = [
+  // navItemsをuseMemoでメモ化
+  const navItems = useMemo(() => [
     { id: '1', label: 'ホーム', path: '/' },
     { id: '2', label: 'ポモドーロ', path: '/pomodoro' },
     { id: '3', label: 'Todo', path: '/todo' },
     { id: '4', label: 'ジャーナル', path: '/journal' },
     { id: '5', label: 'トロフィー', path: '/trophy' },
     { id: '6', label: 'コレクション', path: '/collection' },
-  ]
+  ], [])
 
-  const showNotification = (message, type = 'info') => {
+  const showNotification = useCallback((message, type = 'info') => {
     setNotification({ isVisible: true, message, type })
-  }
+  }, [])
 
   if (!isInitialized) {
     return (
@@ -138,17 +145,22 @@ function App() {
       }
     >
 
-      {currentPath === '/pomodoro' ? (
-        <PomodoroTimer />
-      ) : currentPath === '/todo' ? (
-        <TodoList />
-      ) : currentPath === '/journal' ? (
-        <Journal />
-      ) : currentPath === '/trophy' ? (
-        <TrophyChallenge />
-      ) : currentPath === '/collection' ? (
-        <TrophyCollection />
-      ) : (
+      <Suspense fallback={
+        <div className="text-center" style={{ padding: '2rem' }}>
+          <p>読み込み中...</p>
+        </div>
+      }>
+        {currentPath === '/pomodoro' ? (
+          <PomodoroTimer />
+        ) : currentPath === '/todo' ? (
+          <TodoList />
+        ) : currentPath === '/journal' ? (
+          <Journal />
+        ) : currentPath === '/trophy' ? (
+          <TrophyChallenge />
+        ) : currentPath === '/collection' ? (
+          <TrophyCollection />
+        ) : (
         <div className="main-screen">
           <div className="main-screen-grid">
             {/* ポモドーロタイマーの簡易表示 */}
@@ -291,7 +303,8 @@ function App() {
             </Card>
           </div>
         </div>
-      )}
+        )}
+      </Suspense>
 
       <Notification
         isVisible={notification.isVisible}

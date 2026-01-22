@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import './PomodoroTimer.css'
 import { Card, Button, Modal, Input } from '../components/index.js'
 import pomodoroSettingsService from '../services/PomodoroSettingsService.js'
@@ -25,6 +25,8 @@ function PomodoroTimer() {
   const intervalRef = useRef(null)
   const currentPhaseRef = useRef('work')
   const completedSessionsRef = useRef(0)
+  const startTimeRef = useRef(null) // タイマー開始時刻
+  const expectedEndTimeRef = useRef(null) // タイマー終了予定時刻
 
   // 設定を読み込む
   useEffect(() => {
@@ -54,30 +56,67 @@ function PomodoroTimer() {
     completedSessionsRef.current = completedSessions
   }, [completedSessions])
 
-  // タイマーのカウントダウン処理
+  // タイマーのカウントダウン処理（高精度版）
   useEffect(() => {
     if (timerState === 'running') {
+      // タイマー開始時刻を記録
+      if (!startTimeRef.current) {
+        startTimeRef.current = Date.now()
+        expectedEndTimeRef.current = startTimeRef.current + (timeRemaining * 1000)
+      }
+
+      // 高精度タイマー: Dateオブジェクトを使用して正確な時間を計算
       intervalRef.current = setInterval(() => {
-        setTimeRemaining((prev) => {
-          if (prev <= 1) {
-            return 0
+        const now = Date.now()
+        const elapsed = Math.floor((now - startTimeRef.current) / 1000)
+        const remaining = Math.max(0, timeRemaining - elapsed)
+
+        if (remaining <= 0) {
+          setTimeRemaining(0)
+          // タイマー終了時の処理は別のuseEffectで処理
+        } else {
+          setTimeRemaining(remaining)
+        }
+      }, 100) // 100msごとに更新して滑らかに表示
+
+      // ページがバックグラウンドから復帰した時の補正
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && timerState === 'running') {
+          const now = Date.now()
+          if (expectedEndTimeRef.current) {
+            const remaining = Math.max(0, Math.floor((expectedEndTimeRef.current - now) / 1000))
+            setTimeRemaining(remaining)
+            startTimeRef.current = now - ((timeRemaining - remaining) * 1000)
           }
-          return prev - 1
-        })
-      }, 1000)
+        }
+      }
+
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+          intervalRef.current = null
+        }
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+      }
     } else {
+      // タイマーが停止または一時停止された時
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
         intervalRef.current = null
       }
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
+      if (timerState === 'paused') {
+        // 一時停止時は開始時刻をリセット（再開時に再計算）
+        startTimeRef.current = null
+        expectedEndTimeRef.current = null
+      } else if (timerState === 'idle') {
+        // リセット時は完全にクリア
+        startTimeRef.current = null
+        expectedEndTimeRef.current = null
       }
     }
-  }, [timerState])
+  }, [timerState, timeRemaining])
 
   // タイマーが0になった時の処理
   useEffect(() => {
@@ -119,7 +158,9 @@ function PomodoroTimer() {
         }
 
         setCompletedSessions(newCompletedSessions)
-        // 自動的に次のセッションを開始
+        // 自動的に次のセッションを開始（開始時刻をリセット）
+        startTimeRef.current = null
+        expectedEndTimeRef.current = null
         setTimerState('running')
       } else {
         // 休憩終了 → 作業へ
@@ -129,34 +170,14 @@ function PomodoroTimer() {
         setCurrentPhase('work')
         setTimeRemaining(settings.sessionDuration * 60)
         setCurrentSession((prev) => prev + 1)
-        // 自動的に次のセッションを開始
+        // 自動的に次のセッションを開始（開始時刻をリセット）
+        startTimeRef.current = null
+        expectedEndTimeRef.current = null
         setTimerState('running')
       }
     }
   }, [timeRemaining, timerState, settings])
 
-  // タイマー開始
-  const handleStart = () => {
-    setTimerState('running')
-  }
-
-  // タイマー一時停止
-  const handlePause = () => {
-    setTimerState('paused')
-  }
-
-  // タイマーリセット
-  const handleReset = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
-    setTimerState('idle')
-    setCurrentPhase('work')
-    setTimeRemaining(settings.sessionDuration * 60)
-    setCurrentSession(1)
-    setCompletedSessions(0)
-  }
 
   // 設定モーダルを開く
   const handleOpenSettings = () => {
@@ -217,15 +238,15 @@ function PomodoroTimer() {
     return permission
   }
 
-  // 時間を分:秒形式に変換
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
+  // 時間を分:秒形式に変換（useMemoでメモ化）
+  const formattedTime = useMemo(() => {
+    const mins = Math.floor(timeRemaining / 60)
+    const secs = timeRemaining % 60
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
-  }
+  }, [timeRemaining])
 
-  // 進捗率を計算
-  const calculateProgress = () => {
+  // 進捗率を計算（useMemoでメモ化）
+  const progress = useMemo(() => {
     if (!settings) return 0
 
     let totalTime = 0
@@ -238,10 +259,10 @@ function PomodoroTimer() {
     }
 
     return ((totalTime - timeRemaining) / totalTime) * 100
-  }
+  }, [settings, currentPhase, timeRemaining])
 
-  // 状態表示テキスト
-  const getPhaseText = () => {
+  // 状態表示テキスト（useMemoでメモ化）
+  const phaseText = useMemo(() => {
     switch (currentPhase) {
       case 'work':
         return '作業中'
@@ -252,7 +273,32 @@ function PomodoroTimer() {
       default:
         return ''
     }
-  }
+  }, [currentPhase])
+
+  // ハンドラー関数をuseCallbackでメモ化
+  const handleStart = useCallback(() => {
+    startTimeRef.current = Date.now()
+    expectedEndTimeRef.current = startTimeRef.current + (timeRemaining * 1000)
+    setTimerState('running')
+  }, [timeRemaining])
+
+  const handlePause = useCallback(() => {
+    setTimerState('paused')
+  }, [])
+
+  const handleReset = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+    startTimeRef.current = null
+    expectedEndTimeRef.current = null
+    setTimerState('idle')
+    setCurrentPhase('work')
+    setTimeRemaining(settings.sessionDuration * 60)
+    setCurrentSession(1)
+    setCompletedSessions(0)
+  }, [settings])
 
   if (!settings) {
     return (
@@ -283,19 +329,19 @@ function PomodoroTimer() {
 
           {/* 状態表示 */}
           <div className="pomodoro-phase">
-            <span className="phase-text">{getPhaseText()}</span>
+            <span className="phase-text">{phaseText}</span>
           </div>
 
           {/* タイマー表示 */}
           <div className="pomodoro-timer-display">
-            <div className="timer-time">{formatTime(timeRemaining)}</div>
+            <div className="timer-time">{formattedTime}</div>
           </div>
 
           {/* 進捗バー */}
           <div className="pomodoro-progress">
             <div
               className="progress-bar"
-              style={{ width: `${calculateProgress()}%` }}
+              style={{ width: `${progress}%` }}
             />
           </div>
 
