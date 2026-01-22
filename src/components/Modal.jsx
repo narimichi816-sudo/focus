@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import './Modal.css'
 import Button from './Button.jsx'
 
@@ -12,11 +12,25 @@ import Button from './Button.jsx'
  * @param {boolean} [props.showCloseButton] - 閉じるボタンを表示するか
  */
 function Modal({ isOpen, onClose, children, title, showCloseButton = true }) {
+  const modalRef = useRef(null)
+  const previousActiveElement = useRef(null)
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
+      // フォーカストラップ: モーダルが開いたときにフォーカスを保存
+      previousActiveElement.current = document.activeElement
+      // モーダルが開いたら最初のフォーカス可能な要素にフォーカス
+      setTimeout(() => {
+        const firstFocusable = modalRef.current?.querySelector(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+        firstFocusable?.focus()
+      }, 100)
     } else {
       document.body.style.overflow = ''
+      // モーダルが閉じたときに以前のフォーカスに戻す
+      previousActiveElement.current?.focus()
     }
 
     return () => {
@@ -37,19 +51,67 @@ function Modal({ isOpen, onClose, children, title, showCloseButton = true }) {
     }
   }, [isOpen, onClose])
 
+  // フォーカストラップ: Tabキーでモーダル内のフォーカスを循環させる
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleTabKey = (e) => {
+      if (e.key !== 'Tab') return
+
+      const focusableElements = modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (!focusableElements || focusableElements.length === 0) return
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+
+      if (e.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstElement) {
+          e.preventDefault()
+          lastElement.focus()
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastElement) {
+          e.preventDefault()
+          firstElement.focus()
+        }
+      }
+    }
+
+    const modal = modalRef.current
+    modal?.addEventListener('keydown', handleTabKey)
+    return () => {
+      modal?.removeEventListener('keydown', handleTabKey)
+    }
+  }, [isOpen])
+
   if (!isOpen) return null
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={title ? 'modal-title' : undefined}
+    >
+      <div
+        ref={modalRef}
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         {title && (
           <div className="modal-header">
-            <h2 className="modal-title">{title}</h2>
+            <h2 id="modal-title" className="modal-title">{title}</h2>
             {showCloseButton && (
               <button
                 className="modal-close"
                 onClick={onClose}
                 aria-label="閉じる"
+                type="button"
               >
                 ×
               </button>

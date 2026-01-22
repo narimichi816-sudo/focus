@@ -1,13 +1,14 @@
 .notification {
   position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 2000;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  z-index: var(--z-index-tooltip);
   min-width: 300px;
   max-width: 500px;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  animation: slideInRight 0.3s;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  animation: slideInRight var(--transition-slow);
+  backdrop-filter: blur(10px);
 }
 
 @keyframes slideInRight {
@@ -59,23 +60,23 @@
 
 /* 通知タイプ */
 .notification-success {
-  background-color: #28a745;
-  color: white;
+  background-color: var(--color-success);
+  color: var(--color-text-inverse);
 }
 
 .notification-error {
-  background-color: #dc3545;
-  color: white;
+  background-color: var(--color-error);
+  color: var(--color-text-inverse);
 }
 
 .notification-info {
-  background-color: #17a2b8;
-  color: white;
+  background-color: var(--color-info);
+  color: var(--color-text-inverse);
 }
 
 .notification-warning {
-  background-color: #ffc107;
-  color: #333;
+  background-color: var(--color-warning);
+  color: var(--color-text-primary);
 }
 
 /* レスポンシブデザイン */

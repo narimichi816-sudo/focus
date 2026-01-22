@@ -31,8 +31,20 @@ function Notification({
 
   if (!isVisible) return null
 
+  const roleMap = {
+    success: 'status',
+    error: 'alert',
+    info: 'status',
+    warning: 'alert',
+  }
+
   return (
-    <div className={`notification notification-${type}`}>
+    <div
+      className={`notification notification-${type}`}
+      role={roleMap[type] || 'status'}
+      aria-live={type === 'error' || type === 'warning' ? 'assertive' : 'polite'}
+      aria-atomic="true"
+    >
       <div className="notification-content">
         <span className="notification-message">{message}</span>
         {onClose && (
@@ -40,6 +52,7 @@ function Notification({
             className="notification-close"
             onClick={onClose}
             aria-label="閉じる"
+            type="button"
           >
             ×
           </button>

@@ -112,24 +112,41 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--spacing-xl);
+  animation: fadeIn var(--transition-slow) ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .main-screen-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: var(--spacing-xl);
 }
 
 /* ポモドーロタイマーカード */
 .main-pomodoro-card {
   min-height: 200px;
+  transition: transform var(--transition-base);
+}
+
+.main-pomodoro-card:hover {
+  transform: translateY(-4px);
 }
 
 .main-pomodoro-content {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--spacing-md);
 }
 
 .main-pomodoro-info {
@@ -138,9 +155,9 @@
 
 .main-pomodoro-settings {
   margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #666;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text-secondary);
 }
 
 /* Todoカード */
@@ -261,16 +278,19 @@
 .main-progress-bar-container {
   width: 100%;
   height: 8px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
+  background-color: var(--color-gray-200);
+  border-radius: var(--border-radius-full);
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--spacing-sm);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .main-progress-bar {
   height: 100%;
-  background-color: #4caf50;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, var(--color-success) 0%, var(--color-success-light) 100%);
+  transition: width var(--transition-slow) ease;
+  border-radius: var(--border-radius-full);
+  box-shadow: 0 1px 3px rgba(76, 175, 80, 0.3);
 }
 
 .main-progress-text {

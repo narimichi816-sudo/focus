@@ -19,13 +19,26 @@ function Button({
   onClick,
   type = 'button',
   className = '',
+  'aria-label': ariaLabel,
+  ...props
 }) {
+  const handleKeyDown = (e) => {
+    // EnterキーまたはSpaceキーでクリックをトリガー
+    if ((e.key === 'Enter' || e.key === ' ') && !disabled && onClick) {
+      e.preventDefault()
+      onClick(e)
+    }
+  }
+
   return (
     <button
       type={type}
       className={`btn btn-${variant} btn-${size} ${className}`}
       disabled={disabled}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      aria-label={ariaLabel}
+      {...props}
     >
       {children}
     </button>

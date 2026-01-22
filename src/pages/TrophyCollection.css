@@ -112,22 +112,23 @@
 }
 
 .trophy-item {
-  background: white;
-  border: 2px solid #e9ecef;
-  border-radius: 0.5rem;
-  padding: 1rem;
+  background: var(--color-bg-primary);
+  border: var(--border-width-medium) solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-md);
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all var(--transition-slow);
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: fadeIn var(--transition-base) ease-out;
 }
 
 .trophy-item:hover {
-  border-color: #667eea;
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: var(--shadow-lg);
 }
 
 .trophy-item .trophy-image {
