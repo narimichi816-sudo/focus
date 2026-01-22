@@ -10,6 +10,7 @@ const STORAGE_KEYS = {
   ACQUIRED_TROPHIES: 'focus_app_acquired_trophies',
   POMODORO_SETTINGS: 'focus_app_pomodoro_settings',
   NOTIFICATION_SETTINGS: 'focus_app_notification_settings',
+  CHALLENGE: 'focus_app_challenge',
 }
 
 /**
@@ -130,6 +131,15 @@ export const notificationSettingsStorage = {
 }
 
 /**
+ * トロフィーチャレンジの保存・取得
+ */
+export const challengeStorage = {
+  get: () => getItem(STORAGE_KEYS.CHALLENGE),
+  save: (challenge) => setItem(STORAGE_KEYS.CHALLENGE, challenge),
+  clear: () => removeItem(STORAGE_KEYS.CHALLENGE),
+}
+
+/**
  * すべてのデータをクリアする
  */
 export function clearAllData() {
@@ -143,5 +153,6 @@ export default {
   acquiredTrophyStorage,
   pomodoroSettingsStorage,
   notificationSettingsStorage,
+  challengeStorage,
   clearAllData,
 }

@@ -2,6 +2,7 @@ import { pomodoroSettingsStorage, notificationSettingsStorage } from '../service
 import { createDefaultPomodoroSettings } from '../models/PomodoroSettings.js'
 import notificationService from '../services/NotificationService.js'
 import trophyService from '../services/TrophyService.js'
+import trophyChallengeService from '../services/TrophyChallengeService.js'
 import trophiesData from '../data/trophies.json'
 
 /**
@@ -17,6 +18,7 @@ export function initializeAllData() {
   initializePomodoroSettings()
   initializeNotificationSettings()
   initializeTrophies()
+  initializeTrophyChallenge()
   // 他のデータ（Todo、ジャーナル等）は
   // ユーザーが作成するため、初期化は不要
 }
@@ -63,6 +65,19 @@ export function initializeTrophies() {
 }
 
 /**
+ * トロフィーチャレンジを初期化する
+ * 日付変更時の処理も含む
+ * @returns {void}
+ */
+export function initializeTrophyChallenge() {
+  // 日付変更時の処理（前日のチャレンジをクリア）
+  trophyChallengeService.handleDateChange()
+  
+  // 今日のチャレンジを取得または生成
+  trophyChallengeService.getTodayChallenge()
+}
+
+/**
  * ストレージの状態を確認する
  * @returns {Object} 各ストレージの状態
  */
@@ -78,5 +93,6 @@ export default {
   initializeAllData,
   initializePomodoroSettings,
   initializeTrophies,
+  initializeTrophyChallenge,
   checkStorageStatus,
 }
