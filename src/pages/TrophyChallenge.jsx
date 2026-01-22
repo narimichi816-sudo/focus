@@ -16,6 +16,7 @@ function TrophyChallenge() {
   const [showTestTools, setShowTestTools] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [isResetting, setIsResetting] = useState(false) // リセット中フラグ
+  const [resetTimestamp, setResetTimestamp] = useState(null) // リセット時刻（リセット直後の自動獲得を防ぐため）
 
   useEffect(() => {
     loadChallenge()
@@ -32,12 +33,14 @@ function TrophyChallenge() {
       // 最新のisAcquired状態を確認
       const currentIsAcquired = trophyChallengeService.isTodayChallengeAcquired()
       if (!currentIsAcquired && !isResetting) {
-        checkCondition()
+        // リセット直後（5秒以内）は自動獲得を防ぐ
+        const shouldSkipAutoAcquire = resetTimestamp && (Date.now() - resetTimestamp < 5000)
+        checkCondition(shouldSkipAutoAcquire)
       }
     }, 2000) // 2秒ごとにチェック
 
     return () => clearInterval(interval)
-  }, [isAcquired, isResetting])
+  }, [isAcquired, isResetting, resetTimestamp])
 
   /**
    * チャレンジを読み込む
@@ -52,17 +55,22 @@ function TrophyChallenge() {
   /**
    * 獲得条件をチェックする
    * @param {boolean} skipAutoAcquire - 自動獲得をスキップするかどうか（リセット後など）
+   * @param {boolean} forceCheck - リセット中でも強制的にチェックするかどうか
    */
-  const checkCondition = (skipAutoAcquire = false) => {
-    // リセット中の場合はチェックしない
-    if (isResetting) {
+  const checkCondition = (skipAutoAcquire = false, forceCheck = false) => {
+    // リセット中の場合はチェックしない（forceCheckがtrueの場合は除く）
+    if (isResetting && !forceCheck) {
       return
     }
 
     // 最新の獲得状態を確認
     const currentIsAcquired = trophyChallengeService.isTodayChallengeAcquired()
-    if (currentIsAcquired) {
-      setIsAcquired(true)
+    
+    // 獲得状態を確実に更新（ストレージの状態と同期）
+    setIsAcquired(currentIsAcquired)
+    
+    // 獲得済みの場合、forceCheckがfalseなら早期リターン
+    if (currentIsAcquired && !forceCheck) {
       return // 既に獲得済みの場合はチェックしない
     }
 
@@ -207,38 +215,46 @@ function TrophyChallenge() {
    * テスト用: チャレンジの獲得状態をリセットする
    */
   const handleResetChallenge = () => {
-    if (confirm('チャレンジの獲得状態をリセットしますか？')) {
+    if (confirm('チャレンジの獲得状態をリセットしますか？\n対象タスクの完了状態もリセットされます。')) {
       // リセット中フラグを設定（自動チェックを無効化）
       setIsResetting(true)
       
       const success = trophyChallengeService.resetChallengeAcquisition()
       
       if (success) {
-        // 状態をリセット
-        setIsAcquired(false)
+        // アニメーションを非表示にする
         setShowAnimation(false)
         
-        // ストレージの更新が確実に反映されるように、少し待ってから再読み込み
+        // 状態を明示的にfalseに設定（確実にUIを更新）
+        setIsAcquired(false)
+        
+        // リセット時刻を記録（リセット直後の自動獲得を防ぐため）
+        setResetTimestamp(Date.now())
+        
+        // 対象タスクの完了状態をリセット
+        const eligibleTasks = trophyChallengeService.getEligibleTasks()
+        const completedTasks = eligibleTasks.filter((task) => task.completed)
+        
+        completedTasks.forEach((task) => {
+          todoService.update(task.id, { completed: false })
+        })
+        
+        // チャレンジを再読み込み
+        const todayChallenge = trophyChallengeService.getTodayChallenge()
+        setChallenge(todayChallenge)
+        
+        // ゲージをリセットするため、条件を一時的にnullに設定
+        setCondition(null)
+        
+        // 少し待ってから条件を再チェック（ゲージをリセットしたように見せる）
         setTimeout(() => {
-          // チャレンジを再読み込み（獲得状態を更新）
-          // リセット後の状態を確実に反映するため、明示的に状態を更新
-          const todayChallenge = trophyChallengeService.getTodayChallenge()
-          setChallenge(todayChallenge)
-          
-          // 獲得状態を再確認（ストレージから最新の状態を取得）
-          const isAcquiredNow = trophyChallengeService.isTodayChallengeAcquired()
-          setIsAcquired(isAcquiredNow)
-          
-          // 条件を再チェック（自動獲得はしないように、条件のみ更新）
+          // 条件を更新（自動獲得はしない）
           const conditionResult = trophyChallengeService.checkAcquisitionCondition()
           setCondition(conditionResult)
-        }, 100) // 100ms待ってから再読み込み
+        }, 100) // 100ms待ってから条件を再チェック
         
-        // 少し待ってからリセット中フラグを解除（自動チェックを再有効化）
-        // これにより、リセット直後の自動獲得を防ぐ
-        setTimeout(() => {
-          setIsResetting(false)
-        }, 1000) // 1秒後に自動チェックを再有効化
+        // リセット中フラグを解除（リセット直後の自動獲得はresetTimestampで防ぐ）
+        setIsResetting(false)
         
         alert('チャレンジをリセットしました。')
       } else {

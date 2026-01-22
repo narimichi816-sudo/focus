@@ -240,10 +240,29 @@ class TrophyChallengeService {
   resetChallengeAcquisition() {
     const challenge = this.getTodayChallenge()
     if (!challenge) {
+      console.error('リセット失敗: チャレンジが見つかりません')
       return false
     }
 
-    return acquiredTrophyService.deleteByTrophyId(challenge.trophy.id)
+    const trophyId = challenge.trophy.id
+    console.log('リセット開始: トロフィーID =', trophyId)
+    
+    const result = acquiredTrophyService.deleteByTrophyId(trophyId)
+    
+    if (result) {
+      console.log('リセット成功: トロフィーID =', trophyId)
+      // リセット後の状態を確認
+      const isStillAcquired = acquiredTrophyService.isAcquired(trophyId)
+      console.log('リセット後の獲得状態:', isStillAcquired)
+      if (isStillAcquired) {
+        console.error('リセット失敗: 削除後も獲得状態が残っています')
+        return false
+      }
+    } else {
+      console.error('リセット失敗: トロフィーID =', trophyId, '削除に失敗しました')
+    }
+    
+    return result
   }
 }
 
