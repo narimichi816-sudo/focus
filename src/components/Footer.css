@@ -1,0 +1,25 @@
+.app-footer {
+  background-color: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+  padding: 1rem 2rem;
+  margin-top: auto;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-text {
+  margin: 0;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .app-footer {
+    padding: 1rem;
+  }
+}
