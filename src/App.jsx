@@ -24,6 +24,7 @@ function App() {
     type: 'info',
   })
   const [inputValue, setInputValue] = useState('')
+  const [dateValue, setDateValue] = useState('')
   const [textareaValue, setTextareaValue] = useState('')
 
   useEffect(() => {
@@ -99,8 +100,15 @@ function App() {
               <Input
                 type="date"
                 label="日付入力"
+                value={dateValue}
+                onChange={(e) => setDateValue(e.target.value)}
                 required
               />
+              {dateValue && (
+                <p style={{ fontSize: '0.875rem', color: '#666', margin: 0 }}>
+                  選択された日付: {dateValue}
+                </p>
+              )}
               <Textarea
                 label="テキストエリア"
                 placeholder="複数行のテキストを入力してください"
