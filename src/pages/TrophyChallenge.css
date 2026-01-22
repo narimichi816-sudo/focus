@@ -136,8 +136,10 @@
 .trophy-image {
   width: 150px;
   height: auto;
+  max-width: 100%;
   margin: 0 auto 1rem;
   display: block;
+  object-fit: contain;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
 }
 
@@ -292,6 +294,8 @@
 
   .trophy-image {
     width: 120px;
+    height: auto;
+    object-fit: contain;
   }
 
   .trophy-name {
