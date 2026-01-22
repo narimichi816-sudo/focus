@@ -13,7 +13,7 @@ import {
   Modal,
   Notification,
 } from './components/index.js'
-import { PomodoroTimer, TodoList } from './pages/index.js'
+import { PomodoroTimer, TodoList, Journal } from './pages/index.js'
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false)
@@ -71,6 +71,8 @@ function App() {
         <PomodoroTimer />
       ) : currentPath === '/todo' ? (
         <TodoList />
+      ) : currentPath === '/journal' ? (
+        <Journal />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <Card title="ステップ4: ポモドーロタイマー機能 - 実装完了">
