@@ -13,7 +13,7 @@ import {
   Modal,
   Notification,
 } from './components/index.js'
-import { PomodoroTimer, TodoList, Journal, TrophyChallenge } from './pages/index.js'
+import { PomodoroTimer, TodoList, Journal, TrophyChallenge, TrophyCollection } from './pages/index.js'
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false)
@@ -39,6 +39,7 @@ function App() {
     { id: '3', label: 'Todo', path: '/todo' },
     { id: '4', label: 'ジャーナル', path: '/journal' },
     { id: '5', label: 'トロフィー', path: '/trophy' },
+    { id: '6', label: 'コレクション', path: '/collection' },
   ]
 
   const showNotification = (message, type = 'info') => {
@@ -75,6 +76,8 @@ function App() {
         <Journal />
       ) : currentPath === '/trophy' ? (
         <TrophyChallenge />
+      ) : currentPath === '/collection' ? (
+        <TrophyCollection />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           <Card title="ステップ4: ポモドーロタイマー機能 - 実装完了">
