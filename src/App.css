@@ -107,6 +107,197 @@
   word-wrap: break-word;
 }
 
+/* メイン画面スタイル */
+.main-screen {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.main-screen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* ポモドーロタイマーカード */
+.main-pomodoro-card {
+  min-height: 200px;
+}
+
+.main-pomodoro-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-pomodoro-info {
+  flex: 1;
+}
+
+.main-pomodoro-settings {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #666;
+}
+
+/* Todoカード */
+.main-todo-card {
+  min-height: 200px;
+}
+
+.main-todo-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.main-todo-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.main-todo-item:hover {
+  background-color: #f5f5f5;
+}
+
+.main-todo-item.completed {
+  opacity: 0.6;
+}
+
+.main-todo-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.main-todo-item.completed .main-todo-checkbox {
+  background-color: #4caf50;
+  border-color: #4caf50;
+  color: white;
+}
+
+.main-todo-title {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.main-todo-item.completed .main-todo-title {
+  text-decoration: line-through;
+}
+
+.main-todo-empty {
+  text-align: center;
+  padding: 1rem 0;
+  color: #666;
+}
+
+.main-todo-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+/* トロフィーカード */
+.main-trophy-card {
+  min-height: 200px;
+}
+
+.main-trophy-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-trophy-display {
+  text-align: center;
+}
+
+.main-trophy-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.main-trophy-name {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.main-trophy-description {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.main-trophy-progress {
+  margin-top: 0.5rem;
+}
+
+.main-progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.main-progress-bar {
+  height: 100%;
+  background-color: #4caf50;
+  transition: width 0.3s ease;
+}
+
+.main-progress-text {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+  text-align: center;
+}
+
+.main-progress-hint {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.75rem;
+  color: #999;
+  text-align: center;
+}
+
+.main-trophy-empty {
+  text-align: center;
+  padding: 1rem 0;
+  color: #666;
+}
+
+.main-navigate-button {
+  width: 100%;
+  margin-top: auto;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
   .app-header h1 {
@@ -126,6 +317,15 @@
     width: 100%;
     max-width: 400px;
   }
+
+  .main-screen {
+    padding: 1rem;
+  }
+
+  .main-screen-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -139,5 +339,13 @@
 
   .card button {
     width: 100%;
+  }
+
+  .main-screen {
+    padding: 0.75rem;
+  }
+
+  .main-screen-grid {
+    gap: 1rem;
   }
 }

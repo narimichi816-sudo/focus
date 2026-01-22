@@ -7,31 +7,81 @@ import {
   Header,
   Navigation,
   Button,
-  Input,
-  Textarea,
   Card,
-  Modal,
   Notification,
 } from './components/index.js'
 import { PomodoroTimer, TodoList, Journal, TrophyChallenge, TrophyCollection } from './pages/index.js'
+import pomodoroSettingsService from './services/PomodoroSettingsService.js'
+import todoService from './services/TodoService.js'
+import trophyChallengeService from './services/TrophyChallengeService.js'
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false)
   const [currentPath, setCurrentPath] = useState('/')
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [notification, setNotification] = useState({
     isVisible: false,
     message: '',
     type: 'info',
   })
-  const [inputValue, setInputValue] = useState('')
-  const [dateValue, setDateValue] = useState('')
-  const [textareaValue, setTextareaValue] = useState('')
+  
+  // メイン画面用の状態
+  const [pomodoroSettings, setPomodoroSettings] = useState(null)
+  const [todayTodos, setTodayTodos] = useState([])
+  const [challenge, setChallenge] = useState(null)
+  const [challengeCondition, setChallengeCondition] = useState(null)
 
   useEffect(() => {
     initializeAllData()
     setIsInitialized(true)
   }, [])
+
+  // メイン画面用のデータを読み込む
+  useEffect(() => {
+    if (isInitialized && currentPath === '/') {
+      loadMainScreenData()
+    }
+  }, [isInitialized, currentPath])
+
+  // メイン画面のデータを定期的に更新（Todoやトロフィーの状態が変わる可能性があるため）
+  useEffect(() => {
+    if (!isInitialized || currentPath !== '/') {
+      return
+    }
+
+    // 初回読み込み
+    loadMainScreenData()
+
+    // 5秒ごとにデータを更新（Todoの完了状態やトロフィーの進捗を反映）
+    const interval = setInterval(() => {
+      loadMainScreenData()
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [isInitialized, currentPath])
+
+  // メイン画面のデータを読み込む
+  const loadMainScreenData = () => {
+    // ポモドーロ設定を読み込む
+    const settings = pomodoroSettingsService.get()
+    setPomodoroSettings(settings)
+
+    // 本日のTodoタスクを読み込む
+    const todos = todoService.getTodayTasks()
+    // 未完了のタスクを優先して表示
+    const incompleteTodos = todos.filter(t => !t.completed)
+    const completedTodos = todos.filter(t => t.completed)
+    const sortedTodos = [...incompleteTodos, ...completedTodos]
+    setTodayTodos(sortedTodos.slice(0, 5)) // 最大5件まで表示
+
+    // 本日のトロフィーチャレンジを読み込む
+    const todayChallenge = trophyChallengeService.getTodayChallenge()
+    setChallenge(todayChallenge)
+    
+    if (todayChallenge) {
+      const condition = trophyChallengeService.checkAcquisitionCondition()
+      setChallengeCondition(condition)
+    }
+  }
 
   const navItems = [
     { id: '1', label: 'ホーム', path: '/' },
@@ -79,110 +129,149 @@ function App() {
       ) : currentPath === '/collection' ? (
         <TrophyCollection />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <Card title="ステップ4: ポモドーロタイマー機能 - 実装完了">
-            <p>ポモドーロタイマー機能が実装されました。</p>
-            <p>ナビゲーションから「ポモドーロ」を選択してタイマーを利用できます。</p>
-          </Card>
+        <div className="main-screen">
+          <div className="main-screen-grid">
+            {/* ポモドーロタイマーの簡易表示 */}
+            <Card 
+              title="ポモドーロタイマー" 
+              className="main-pomodoro-card"
+            >
+              {pomodoroSettings ? (
+                <div className="main-pomodoro-content">
+                  <div className="main-pomodoro-info">
+                    <p className="main-pomodoro-settings">
+                      作業時間: {pomodoroSettings.sessionDuration}分
+                      <br />
+                      短休憩: {pomodoroSettings.shortBreakDuration}分
+                      <br />
+                      長休憩: {pomodoroSettings.longBreakDuration}分
+                      <br />
+                      繰り返し: {pomodoroSettings.totalSessions}回
+                    </p>
+                  </div>
+                  <Button 
+                    variant="primary" 
+                    onClick={() => setCurrentPath('/pomodoro')}
+                    className="main-navigate-button"
+                  >
+                    タイマーを開く
+                  </Button>
+                </div>
+              ) : (
+                <p>読み込み中...</p>
+              )}
+            </Card>
 
-          <div className="grid grid-2">
-            <Card title="ボタンコンポーネント">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <Button variant="primary" onClick={() => showNotification('プライマリーボタンがクリックされました', 'info')}>
-                  プライマリーボタン
-                </Button>
-                <Button variant="secondary" onClick={() => showNotification('セカンダリーボタンがクリックされました', 'info')}>
-                  セカンダリーボタン
-                </Button>
-                <Button variant="danger" onClick={() => showNotification('危険ボタンがクリックされました', 'error')}>
-                  危険ボタン
-                </Button>
-                <Button variant="outline" onClick={() => setIsModalOpen(true)}>
-                  モーダルを開く
-                </Button>
-                <Button disabled>無効化ボタン</Button>
+            {/* 本日のTodoリストの簡易表示 */}
+            <Card 
+              title="本日のTodo" 
+              className="main-todo-card"
+            >
+              <div className="main-todo-content">
+                {todayTodos.length === 0 ? (
+                  <div className="main-todo-empty">
+                    <p>本日のタスクはありません</p>
+                    <Button 
+                      variant="outline" 
+                      size="small"
+                      onClick={() => setCurrentPath('/todo')}
+                    >
+                      Todoリストを開く
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <ul className="main-todo-list">
+                      {todayTodos.map((todo) => (
+                        <li 
+                          key={todo.id} 
+                          className={`main-todo-item ${todo.completed ? 'completed' : ''}`}
+                        >
+                          <span className="main-todo-checkbox">
+                            {todo.completed ? '✓' : '○'}
+                          </span>
+                          <span className="main-todo-title">{todo.title}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="main-todo-footer">
+                      <Button 
+                        variant="outline" 
+                        size="small"
+                        onClick={() => setCurrentPath('/todo')}
+                      >
+                        すべて表示
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             </Card>
 
-            <Card title="入力コンポーネント">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <Input
-                  label="テキスト入力"
-                  placeholder="テキストを入力してください"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                />
-                <Input
-                  type="date"
-                  label="日付入力"
-                  value={dateValue}
-                  onChange={(e) => setDateValue(e.target.value)}
-                  required
-                />
-                {dateValue && (
-                  <p style={{ fontSize: '0.875rem', color: '#666', margin: 0 }}>
-                    選択された日付: {dateValue}
-                  </p>
-                )}
-                <Textarea
-                  label="テキストエリア"
-                  placeholder="複数行のテキストを入力してください"
-                  value={textareaValue}
-                  onChange={(e) => setTextareaValue(e.target.value)}
-                  rows={4}
-                />
-              </div>
+            {/* 本日のトロフィーチャレンジの簡易表示 */}
+            <Card 
+              title="本日のトロフィーチャレンジ" 
+              className="main-trophy-card"
+            >
+              {challenge ? (
+                <div className="main-trophy-content">
+                  <div className="main-trophy-display">
+                    <img 
+                      src={challenge.trophy.image} 
+                      alt={challenge.trophy.name}
+                      className="main-trophy-image"
+                    />
+                    <h3 className="main-trophy-name">{challenge.trophy.name}</h3>
+                    <p className="main-trophy-description">{challenge.trophy.description}</p>
+                  </div>
+                  
+                  {challengeCondition && (
+                    <div className="main-trophy-progress">
+                      <div className="main-progress-bar-container">
+                        <div
+                          className="main-progress-bar"
+                          style={{
+                            width: `${challengeCondition.totalCount > 0 
+                              ? (challengeCondition.completedCount / challengeCondition.totalCount) * 100 
+                              : 0}%`,
+                          }}
+                        />
+                      </div>
+                      <p className="main-progress-text">
+                        {challengeCondition.completedCount} / {challengeCondition.totalCount} 完了
+                      </p>
+                      {challengeCondition.totalCount === 0 && (
+                        <p className="main-progress-hint">
+                          2日前までに作成されたタスクを設定してください
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <Button 
+                    variant="primary" 
+                    onClick={() => setCurrentPath('/trophy')}
+                    className="main-navigate-button"
+                  >
+                    チャレンジ詳細を見る
+                  </Button>
+                </div>
+              ) : (
+                <div className="main-trophy-empty">
+                  <p>トロフィーが読み込めませんでした</p>
+                  <Button 
+                    variant="outline" 
+                    size="small"
+                    onClick={() => setCurrentPath('/trophy')}
+                  >
+                    トロフィーページを開く
+                  </Button>
+                </div>
+              )}
             </Card>
           </div>
-
-          <Card title="通知コンポーネント">
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <Button
-                variant="primary"
-                size="small"
-                onClick={() => showNotification('成功メッセージ', 'success')}
-              >
-                成功通知
-              </Button>
-              <Button
-                variant="danger"
-                size="small"
-                onClick={() => showNotification('エラーメッセージ', 'error')}
-              >
-                エラー通知
-              </Button>
-              <Button
-                variant="secondary"
-                size="small"
-                onClick={() => showNotification('情報メッセージ', 'info')}
-              >
-                情報通知
-              </Button>
-              <Button
-                variant="outline"
-                size="small"
-                onClick={() => showNotification('警告メッセージ', 'warning')}
-              >
-                警告通知
-              </Button>
-            </div>
-          </Card>
         </div>
       )}
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="モーダルコンポーネント"
-      >
-        <p>これはモーダルコンポーネントのデモです。</p>
-        <p>ESCキーを押すか、背景をクリックすると閉じます。</p>
-        <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-          <Button variant="secondary" onClick={() => setIsModalOpen(false)}>
-            閉じる
-          </Button>
-        </div>
-      </Modal>
 
       <Notification
         isVisible={notification.isVisible}
