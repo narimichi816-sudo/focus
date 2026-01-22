@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import './PomodoroTimer.css'
 import { Card, Button, Modal, Input } from '../components/index.js'
 import pomodoroSettingsService from '../services/PomodoroSettingsService.js'
+import notificationService from '../services/NotificationService.js'
 
 /**
  * ポモドーロタイマーページコンポーネント
@@ -10,6 +11,9 @@ function PomodoroTimer() {
   const [settings, setSettings] = useState(null)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
   const [tempSettings, setTempSettings] = useState(null)
+  const [isNotificationSettingsModalOpen, setIsNotificationSettingsModalOpen] = useState(false)
+  const [notificationSettings, setNotificationSettings] = useState(null)
+  const [tempNotificationSettings, setTempNotificationSettings] = useState(null)
 
   // タイマー状態
   const [timerState, setTimerState] = useState('idle') // idle, running, paused
@@ -27,6 +31,18 @@ function PomodoroTimer() {
     const loadedSettings = pomodoroSettingsService.get()
     setSettings(loadedSettings)
     setTimeRemaining(loadedSettings.sessionDuration * 60) // 分を秒に変換
+
+    // 通知設定を読み込む
+    const loadedNotificationSettings = notificationService.getSettings()
+    setNotificationSettings(loadedNotificationSettings)
+  }, [])
+
+  // 通知の許可をリクエスト（初回のみ）
+  useEffect(() => {
+    if (notificationService.getPermission() === 'default') {
+      // ユーザーが明示的に許可をリクエストするまで待つ
+      // 通知設定モーダルでリクエストする
+    }
   }, [])
 
   // currentPhaseとcompletedSessionsをrefに同期
@@ -78,6 +94,9 @@ function PomodoroTimer() {
         // 作業セッション完了
         const newCompletedSessions = completed + 1
 
+        // セッション終了通知
+        notificationService.notifySessionEnd()
+
         // 全セッション完了の判定
         if (newCompletedSessions >= settings.totalSessions) {
           setTimerState('idle')
@@ -104,6 +123,9 @@ function PomodoroTimer() {
         setTimerState('running')
       } else {
         // 休憩終了 → 作業へ
+        // 休憩終了通知
+        notificationService.notifyBreakEnd(phase)
+
         setCurrentPhase('work')
         setTimeRemaining(settings.sessionDuration * 60)
         setCurrentSession((prev) => prev + 1)
@@ -161,6 +183,38 @@ function PomodoroTimer() {
   const handleCancelSettings = () => {
     setIsSettingsModalOpen(false)
     setTempSettings(null)
+  }
+
+  // 通知設定モーダルを開く
+  const handleOpenNotificationSettings = () => {
+    setTempNotificationSettings({ ...notificationSettings })
+    setIsNotificationSettingsModalOpen(true)
+  }
+
+  // 通知設定を保存
+  const handleSaveNotificationSettings = () => {
+    notificationService.updateSettings(tempNotificationSettings)
+    setNotificationSettings({ ...tempNotificationSettings })
+    setIsNotificationSettingsModalOpen(false)
+  }
+
+  // 通知設定をキャンセル
+  const handleCancelNotificationSettings = () => {
+    setIsNotificationSettingsModalOpen(false)
+    setTempNotificationSettings(null)
+  }
+
+  // 通知の許可をリクエスト
+  const handleRequestNotificationPermission = async () => {
+    const permission = await notificationService.requestPermission()
+    if (permission === 'granted') {
+      // 許可された場合、通知設定を更新
+      setTempNotificationSettings((prev) => ({
+        ...prev,
+        enabled: true,
+      }))
+    }
+    return permission
   }
 
   // 時間を分:秒形式に変換
@@ -262,6 +316,9 @@ function PomodoroTimer() {
             <Button variant="outline" onClick={handleOpenSettings}>
               設定
             </Button>
+            <Button variant="outline" onClick={handleOpenNotificationSettings}>
+              通知設定
+            </Button>
           </div>
         </div>
       </Card>
@@ -359,6 +416,135 @@ function PomodoroTimer() {
                 保存
               </Button>
               <Button variant="secondary" onClick={handleCancelSettings}>
+                キャンセル
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* 通知設定モーダル */}
+      <Modal
+        isOpen={isNotificationSettingsModalOpen}
+        onClose={handleCancelNotificationSettings}
+        title="通知設定"
+      >
+        {tempNotificationSettings && (
+          <div className="pomodoro-settings-form">
+            <div className="settings-field">
+              <div className="checkbox-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={tempNotificationSettings.enabled || false}
+                    onChange={(e) =>
+                      setTempNotificationSettings({
+                        ...tempNotificationSettings,
+                        enabled: e.target.checked,
+                      })
+                    }
+                  />
+                  <span>通知を有効にする</span>
+                </label>
+              </div>
+            </div>
+
+            {tempNotificationSettings.enabled && (
+              <>
+                <div className="settings-field">
+                  <div className="checkbox-group">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={tempNotificationSettings.sessionEnd !== false}
+                        onChange={(e) =>
+                          setTempNotificationSettings({
+                            ...tempNotificationSettings,
+                            sessionEnd: e.target.checked,
+                          })
+                        }
+                      />
+                      <span>セッション終了時に通知</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="settings-field">
+                  <div className="checkbox-group">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={tempNotificationSettings.breakEnd !== false}
+                        onChange={(e) =>
+                          setTempNotificationSettings({
+                            ...tempNotificationSettings,
+                            breakEnd: e.target.checked,
+                          })
+                        }
+                      />
+                      <span>休憩終了時に通知</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="settings-field">
+                  <div className="checkbox-group">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={tempNotificationSettings.soundEnabled || false}
+                        onChange={(e) =>
+                          setTempNotificationSettings({
+                            ...tempNotificationSettings,
+                            soundEnabled: e.target.checked,
+                          })
+                        }
+                      />
+                      <span>音声通知を有効にする</span>
+                    </label>
+                  </div>
+                </div>
+
+                {notificationService.getPermission() !== 'granted' && (
+                  <div className="settings-field">
+                    <div className="notification-permission-info">
+                      <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.875rem', color: '#666' }}>
+                        ブラウザ通知を使用するには、通知の許可が必要です。
+                      </p>
+                      <Button
+                        variant="primary"
+                        size="small"
+                        onClick={handleRequestNotificationPermission}
+                      >
+                        通知の許可をリクエスト
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {notificationService.getPermission() === 'granted' && (
+                  <div className="settings-field">
+                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#4caf50' }}>
+                      ✓ 通知の許可が得られています
+                    </p>
+                  </div>
+                )}
+
+                {notificationService.getPermission() === 'denied' && (
+                  <div className="settings-field">
+                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#f44336' }}>
+                      ⚠ 通知が拒否されています。ブラウザの設定から許可してください。
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+
+            <div className="settings-actions">
+              <Button variant="primary" onClick={handleSaveNotificationSettings}>
+                保存
+              </Button>
+              <Button variant="secondary" onClick={handleCancelNotificationSettings}>
                 キャンセル
               </Button>
             </div>

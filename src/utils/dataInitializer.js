@@ -1,5 +1,6 @@
-import { pomodoroSettingsStorage } from '../services/StorageManager.js'
+import { pomodoroSettingsStorage, notificationSettingsStorage } from '../services/StorageManager.js'
 import { createDefaultPomodoroSettings } from '../models/PomodoroSettings.js'
+import notificationService from '../services/NotificationService.js'
 
 /**
  * データ初期化処理
@@ -12,6 +13,7 @@ import { createDefaultPomodoroSettings } from '../models/PomodoroSettings.js'
  */
 export function initializeAllData() {
   initializePomodoroSettings()
+  initializeNotificationSettings()
   // 他のデータ（Todo、ジャーナル、トロフィー等）は
   // ユーザーが作成するため、初期化は不要
 }
@@ -30,12 +32,24 @@ export function initializePomodoroSettings() {
 }
 
 /**
+ * 通知設定を初期化する
+ * 設定が存在しない場合、デフォルト設定を保存する
+ * @returns {void}
+ */
+export function initializeNotificationSettings() {
+  // NotificationServiceが自動的に初期化するため、ここでは何もしない
+  // ただし、明示的に初期化を確認する
+  notificationService.loadSettings()
+}
+
+/**
  * ストレージの状態を確認する
  * @returns {Object} 各ストレージの状態
  */
 export function checkStorageStatus() {
   return {
     pomodoroSettings: pomodoroSettingsStorage.get() !== null,
+    notificationSettings: notificationSettingsStorage.get() !== null,
   }
 }
 

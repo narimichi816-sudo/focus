@@ -9,6 +9,7 @@ const STORAGE_KEYS = {
   TROPHIES: 'focus_app_trophies',
   ACQUIRED_TROPHIES: 'focus_app_acquired_trophies',
   POMODORO_SETTINGS: 'focus_app_pomodoro_settings',
+  NOTIFICATION_SETTINGS: 'focus_app_notification_settings',
 }
 
 /**
@@ -120,6 +121,15 @@ export const pomodoroSettingsStorage = {
 }
 
 /**
+ * 通知設定の保存・取得
+ */
+export const notificationSettingsStorage = {
+  get: () => getItem(STORAGE_KEYS.NOTIFICATION_SETTINGS),
+  save: (settings) => setItem(STORAGE_KEYS.NOTIFICATION_SETTINGS, settings),
+  clear: () => removeItem(STORAGE_KEYS.NOTIFICATION_SETTINGS),
+}
+
+/**
  * すべてのデータをクリアする
  */
 export function clearAllData() {
@@ -132,5 +142,6 @@ export default {
   trophyStorage,
   acquiredTrophyStorage,
   pomodoroSettingsStorage,
+  notificationSettingsStorage,
   clearAllData,
 }
