@@ -56,20 +56,24 @@ function PomodoroTimer() {
     completedSessionsRef.current = completedSessions
   }, [completedSessions])
 
+  // timerStateが'running'になった時にexpectedEndTimeRefを初期化
+  useEffect(() => {
+    if (timerState === 'running' && (!startTimeRef.current || !expectedEndTimeRef.current)) {
+      startTimeRef.current = Date.now()
+      expectedEndTimeRef.current = startTimeRef.current + (timeRemaining * 1000)
+    }
+  }, [timerState]) // timerStateのみを依存配列に（無限ループを防止）
+
   // タイマーのカウントダウン処理（高精度版）
   useEffect(() => {
     if (timerState === 'running') {
-      // タイマー開始時刻を記録
-      if (!startTimeRef.current) {
-        startTimeRef.current = Date.now()
-        expectedEndTimeRef.current = startTimeRef.current + (timeRemaining * 1000)
-      }
 
       // 高精度タイマー: Dateオブジェクトを使用して正確な時間を計算
       intervalRef.current = setInterval(() => {
+        if (!expectedEndTimeRef.current) return
+        
         const now = Date.now()
-        const elapsed = Math.floor((now - startTimeRef.current) / 1000)
-        const remaining = Math.max(0, timeRemaining - elapsed)
+        const remaining = Math.max(0, Math.floor((expectedEndTimeRef.current - now) / 1000))
 
         if (remaining <= 0) {
           setTimeRemaining(0)
@@ -86,7 +90,6 @@ function PomodoroTimer() {
           if (expectedEndTimeRef.current) {
             const remaining = Math.max(0, Math.floor((expectedEndTimeRef.current - now) / 1000))
             setTimeRemaining(remaining)
-            startTimeRef.current = now - ((timeRemaining - remaining) * 1000)
           }
         }
       }
@@ -116,7 +119,7 @@ function PomodoroTimer() {
         expectedEndTimeRef.current = null
       }
     }
-  }, [timerState, timeRemaining])
+  }, [timerState]) // timerStateのみを依存配列に
 
   // タイマーが0になった時の処理
   useEffect(() => {
@@ -161,6 +164,7 @@ function PomodoroTimer() {
         // 自動的に次のセッションを開始（開始時刻をリセット）
         startTimeRef.current = null
         expectedEndTimeRef.current = null
+        // 状態更新後にタイマーを開始
         setTimerState('running')
       } else {
         // 休憩終了 → 作業へ
@@ -173,6 +177,7 @@ function PomodoroTimer() {
         // 自動的に次のセッションを開始（開始時刻をリセット）
         startTimeRef.current = null
         expectedEndTimeRef.current = null
+        // 状態更新後にタイマーを開始
         setTimerState('running')
       }
     }

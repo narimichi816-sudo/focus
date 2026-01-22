@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import './App.css'
 import './styles/common.css'
 import { initializeAllData } from './utils/dataInitializer.js'
@@ -10,16 +10,10 @@ import {
   Card,
   Notification,
 } from './components/index.js'
+import { PomodoroTimer, TodoList, Journal, TrophyChallenge, TrophyCollection } from './pages/index.js'
 import pomodoroSettingsService from './services/PomodoroSettingsService.js'
 import todoService from './services/TodoService.js'
 import trophyChallengeService from './services/TrophyChallengeService.js'
-
-// コード分割: ページコンポーネントを遅延読み込み
-const PomodoroTimer = lazy(() => import('./pages/PomodoroTimer.jsx'))
-const TodoList = lazy(() => import('./pages/TodoList.jsx'))
-const Journal = lazy(() => import('./pages/Journal.jsx'))
-const TrophyChallenge = lazy(() => import('./pages/TrophyChallenge.jsx'))
-const TrophyCollection = lazy(() => import('./pages/TrophyCollection.jsx'))
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false)
@@ -61,30 +55,6 @@ function App() {
     window.location.hash = path === '/' ? '' : path
   }
 
-  // メイン画面用のデータを読み込む
-  useEffect(() => {
-    if (isInitialized && currentPath === '/') {
-      loadMainScreenData()
-    }
-  }, [isInitialized, currentPath])
-
-  // メイン画面のデータを定期的に更新（Todoやトロフィーの状態が変わる可能性があるため）
-  useEffect(() => {
-    if (!isInitialized || currentPath !== '/') {
-      return
-    }
-
-    // 初回読み込み
-    loadMainScreenData()
-
-    // 5秒ごとにデータを更新（Todoの完了状態やトロフィーの進捗を反映）
-    const interval = setInterval(() => {
-      loadMainScreenData()
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [isInitialized, currentPath, loadMainScreenData])
-
   // メイン画面のデータを読み込む（useCallbackでメモ化）
   const loadMainScreenData = useCallback(() => {
     // ポモドーロ設定を読み込む
@@ -108,6 +78,30 @@ function App() {
       setChallengeCondition(condition)
     }
   }, [])
+
+  // メイン画面用のデータを読み込む
+  useEffect(() => {
+    if (isInitialized && currentPath === '/') {
+      loadMainScreenData()
+    }
+  }, [isInitialized, currentPath, loadMainScreenData])
+
+  // メイン画面のデータを定期的に更新（Todoやトロフィーの状態が変わる可能性があるため）
+  useEffect(() => {
+    if (!isInitialized || currentPath !== '/') {
+      return
+    }
+
+    // 初回読み込み
+    loadMainScreenData()
+
+    // 5秒ごとにデータを更新（Todoの完了状態やトロフィーの進捗を反映）
+    const interval = setInterval(() => {
+      loadMainScreenData()
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [isInitialized, currentPath, loadMainScreenData])
 
   // navItemsをuseMemoでメモ化
   const navItems = useMemo(() => [
@@ -145,22 +139,17 @@ function App() {
       }
     >
 
-      <Suspense fallback={
-        <div className="text-center" style={{ padding: '2rem' }}>
-          <p>読み込み中...</p>
-        </div>
-      }>
-        {currentPath === '/pomodoro' ? (
-          <PomodoroTimer />
-        ) : currentPath === '/todo' ? (
-          <TodoList />
-        ) : currentPath === '/journal' ? (
-          <Journal />
-        ) : currentPath === '/trophy' ? (
-          <TrophyChallenge />
-        ) : currentPath === '/collection' ? (
-          <TrophyCollection />
-        ) : (
+      {currentPath === '/pomodoro' ? (
+        <PomodoroTimer />
+      ) : currentPath === '/todo' ? (
+        <TodoList />
+      ) : currentPath === '/journal' ? (
+        <Journal />
+      ) : currentPath === '/trophy' ? (
+        <TrophyChallenge />
+      ) : currentPath === '/collection' ? (
+        <TrophyCollection />
+      ) : (
         <div className="main-screen">
           <div className="main-screen-grid">
             {/* ポモドーロタイマーの簡易表示 */}
@@ -303,8 +292,7 @@ function App() {
             </Card>
           </div>
         </div>
-        )}
-      </Suspense>
+      )}
 
       <Notification
         isVisible={notification.isVisible}
