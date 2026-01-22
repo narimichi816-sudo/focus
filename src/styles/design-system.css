@@ -1,18 +1,18 @@
 /**
- * ??????????
- * ??????????????????????????????????????
+ * デザインシステム
+ * アプリ全体で使用するデザイントークン（色、スペーシング、タイポグラフィなど）を定義
  */
 
 :root {
-  /* ===== ??????? ===== */
+  /* ===== カラーパレット ===== */
   
-  /* ???????? */
+  /* プライマリカラー */
   --color-primary: #667eea;
   --color-primary-dark: #5568d3;
   --color-primary-light: #8b9ef7;
   --color-primary-lighter: #b0bff9;
   
-  /* ???????? */
+  /* セカンダリカラー */
   --color-secondary: #764ba2;
   --color-secondary-dark: #5d3a7f;
   --color-secondary-light: #9568c4;
@@ -22,31 +22,31 @@
   --color-accent-dark: #e03e52;
   --color-accent-light: #f77a8a;
   
-  /* ????? */
+  /* 成功 */
   --color-success: #4caf50;
   --color-success-dark: #3d8b40;
   --color-success-light: #6fbf72;
   --color-success-bg: #d4edda;
   
-  /* ????? */
+  /* 警告 */
   --color-warning: #ff9800;
   --color-warning-dark: #e68900;
   --color-warning-light: #ffb340;
   --color-warning-bg: #fff3cd;
   
-  /* ?????? */
+  /* エラー */
   --color-error: #f44336;
   --color-error-dark: #d32f2f;
   --color-error-light: #f77066;
   --color-error-bg: #ffebee;
   
-  /* ????? */
+  /* 情報 */
   --color-info: #2196f3;
   --color-info-dark: #1976d2;
   --color-info-light: #64b5f6;
   --color-info-bg: #e3f2fd;
   
-  /* ??????? */
+  /* グレースケール */
   --color-gray-50: #fafafa;
   --color-gray-100: #f5f5f5;
   --color-gray-200: #eeeeee;
@@ -58,31 +58,31 @@
   --color-gray-800: #424242;
   --color-gray-900: #212121;
   
-  /* ??????? */
+  /* テキストカラー */
   --color-text-primary: #212121;
   --color-text-secondary: #616161;
   --color-text-tertiary: #9e9e9e;
   --color-text-inverse: #ffffff;
   
-  /* ????? */
+  /* 背景色 */
   --color-bg-primary: #ffffff;
   --color-bg-secondary: #f5f5f5;
   --color-bg-tertiary: #fafafa;
   --color-bg-overlay: rgba(0, 0, 0, 0.5);
   
-  /* ??????? */
+  /* ボーダーカラー */
   --color-border: #e0e0e0;
   --color-border-light: #f0f0f0;
   --color-border-dark: #bdbdbd;
   
-  /* ===== ??????? ===== */
+  /* ===== タイポグラフィ ===== */
   
-  /* ????????? */
+  /* フォントファミリー */
   --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   --font-family-mono: 'Courier New', 'Monaco', 'Menlo', 'Consolas', monospace;
   
-  /* ??????? */
+  /* フォントサイズ */
   --font-size-xs: 0.75rem;    /* 12px */
   --font-size-sm: 0.875rem;   /* 14px */
   --font-size-base: 1rem;     /* 16px */
@@ -93,13 +93,13 @@
   --font-size-3xl: 2.5rem;    /* 40px */
   --font-size-4xl: 3rem;      /* 48px */
   
-  /* ???????? */
+  /* フォントウェイト */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   
-  /* ?? */
+  /* 行間 */
   --line-height-tight: 1.2;
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.75;
@@ -115,7 +115,7 @@
   --spacing-2xl: 3rem;     /* 48px */
   --spacing-3xl: 4rem;     /* 64px */
   
-  /* ===== ???? ===== */
+  /* ===== ボーダー ===== */
   
   --border-radius-sm: 0.25rem;   /* 4px */
   --border-radius-md: 0.5rem;    /* 8px */
@@ -127,7 +127,7 @@
   --border-width-medium: 2px;
   --border-width-thick: 4px;
   
-  /* ===== ???? ===== */
+  /* ===== シャドウ ===== */
   
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -135,7 +135,7 @@
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
   --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
   
-  /* ===== ??????? ===== */
+  /* ===== トランジション ===== */
   
   --transition-fast: 0.15s ease;
   --transition-base: 0.2s ease;
@@ -160,9 +160,9 @@
   --z-index-tooltip: 1070;
 }
 
-/* ???????????????? */
+/* ダークモード対応（将来の拡張用） */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* ??????????????????? */
+    /* ダークモード用のカラーバリエーションを定義 */
   }
 }
