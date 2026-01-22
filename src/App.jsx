@@ -30,10 +30,30 @@ function App() {
   const [challenge, setChallenge] = useState(null)
   const [challengeCondition, setChallengeCondition] = useState(null)
 
+  // URLから初期パスを取得
   useEffect(() => {
+    const hash = window.location.hash.slice(1) || '/'
+    setCurrentPath(hash)
     initializeAllData()
     setIsInitialized(true)
   }, [])
+
+  // ブラウザの戻る/進むボタンに対応
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.slice(1) || '/'
+      setCurrentPath(hash)
+    }
+
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
+  // パス変更時にURLを更新
+  const navigate = (path) => {
+    setCurrentPath(path)
+    window.location.hash = path === '/' ? '' : path
+  }
 
   // メイン画面用のデータを読み込む
   useEffect(() => {
@@ -113,7 +133,7 @@ function App() {
         <Navigation
           items={navItems}
           currentPath={currentPath}
-          onNavigate={setCurrentPath}
+          onNavigate={navigate}
         />
       }
     >
@@ -151,7 +171,7 @@ function App() {
                   </div>
                   <Button 
                     variant="primary" 
-                    onClick={() => setCurrentPath('/pomodoro')}
+                    onClick={() => navigate('/pomodoro')}
                     className="main-navigate-button"
                   >
                     タイマーを開く
@@ -174,7 +194,7 @@ function App() {
                     <Button 
                       variant="outline" 
                       size="small"
-                      onClick={() => setCurrentPath('/todo')}
+                      onClick={() => navigate('/todo')}
                     >
                       Todoリストを開く
                     </Button>
@@ -198,7 +218,7 @@ function App() {
                       <Button 
                         variant="outline" 
                         size="small"
-                        onClick={() => setCurrentPath('/todo')}
+                        onClick={() => navigate('/todo')}
                       >
                         すべて表示
                       </Button>
@@ -250,7 +270,7 @@ function App() {
 
                   <Button 
                     variant="primary" 
-                    onClick={() => setCurrentPath('/trophy')}
+                    onClick={() => navigate('/trophy')}
                     className="main-navigate-button"
                   >
                     チャレンジ詳細を見る
@@ -262,7 +282,7 @@ function App() {
                   <Button 
                     variant="outline" 
                     size="small"
-                    onClick={() => setCurrentPath('/trophy')}
+                    onClick={() => navigate('/trophy')}
                   >
                     トロフィーページを開く
                   </Button>

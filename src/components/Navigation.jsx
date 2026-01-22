@@ -18,12 +18,21 @@ function Navigation({ items = [], currentPath = '', onNavigate }) {
     setIsMobileMenuOpen(false)
   }
 
+  const handleKeyDown = (e, path) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleNavClick(path)
+    }
+  }
+
   return (
     <nav className="navigation">
       <button
         className="mobile-menu-toggle"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        aria-label="メニューを開く"
+        aria-label={isMobileMenuOpen ? 'メニューを閉じる' : 'メニューを開く'}
+        aria-expanded={isMobileMenuOpen}
+        aria-controls="navigation-menu"
       >
         <span className="hamburger-icon">
           <span></span>
@@ -32,7 +41,9 @@ function Navigation({ items = [], currentPath = '', onNavigate }) {
         </span>
       </button>
       <ul
+        id="navigation-menu"
         className={`nav-list ${isMobileMenuOpen ? 'nav-list-open' : ''}`}
+        role="menubar"
       >
         {items.map((item) => (
           <li key={item.id} className="nav-item">
@@ -41,6 +52,9 @@ function Navigation({ items = [], currentPath = '', onNavigate }) {
                 currentPath === item.path ? 'nav-link-active' : ''
               }`}
               onClick={() => handleNavClick(item.path)}
+              onKeyDown={(e) => handleKeyDown(e, item.path)}
+              aria-label={`${item.label}に移動`}
+              aria-current={currentPath === item.path ? 'page' : undefined}
             >
               {item.label}
             </button>
